@@ -355,3 +355,7 @@ message OneOfEncoder {
 
   bool boolean = 3;
 }
+
+message TooManyFields {
+  uint32 a = 32;
+}

@@ -24,22 +24,6 @@ message TooManyFields {
       assert_equal 123, msg.a
     end
 
-    def test_decode_repeated_unpacked
-      unit = parse_string(<<-EOPROTO)
-syntax = "proto3";
-
-message UnpackedFields {
-  uint32 a = 1;
-  repeated uint32 ids = 2 [packed = false];
-}
-      EOPROTO
-      gen = CodeGen.new unit
-      klass = Class.new { self.class_eval gen.to_ruby }
-
-      msg = klass::UnpackedFields.new(a: 123, ids: [1, 2, 0xFF, 0xFF])
-      msg = klass::UnpackedFields.decode(klass::UnpackedFields.encode(msg))
-    end
-
     def test_uppercase_field_name
       unit = parse_string(<<-EOPROTO)
 syntax = "proto3";
