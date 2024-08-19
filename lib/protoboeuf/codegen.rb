@@ -190,8 +190,17 @@ module ProtoBoeuf
       end
 
       def encode_tag(field)
+        result = +""
         tag = (field.number << 3) | CodeGen.wire_type(field)
-        "buff << #{sprintf("%#04x", tag)}\n"
+        while tag != 0
+          byte = tag & 0x7F
+          tag >>= 7
+          tag &= (1 << 57) - 1
+          byte |= 0x80 if tag != 0
+
+          result << "buff << #{sprintf("%#04x", byte)}\n"
+        end
+        result
       end
 
       def encode_length(field, len_expr)
@@ -1027,6 +1036,12 @@ module ProtoBoeuf
             <%- end -%>
 
             return self if index >= len
+
+            # tag couldn't fit in one byte
+            if tag >= 0x80
+              index -=1
+              tag = <%= pull_varint %>
+            end
           end
         end
       ERB
