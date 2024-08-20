@@ -4,6 +4,34 @@ require "google/protobuf/descriptor_pb"
 
 module ProtoBoeuf
   class CodeGenTest < Test
+    def test_too_many_fields_multiple
+      skip "fix me"
+      unit = parse_string(<<-EOPROTO)
+syntax = "proto3";
+
+message TooManyFieldsAgain {
+  uint32 a = 31;
+  uint32 b = 36;
+}
+      EOPROTO
+      gen = CodeGen.new unit
+
+      $stderr.puts gen.to_ruby
+      klass = Class.new { self.class_eval gen.to_ruby }
+
+      msg = klass::TooManyFieldsAgain.new(a: 0xFF, b: 456)
+      data = klass::TooManyFieldsAgain.encode(msg)
+
+      File.binwrite("out.bin", data)
+      # Google
+      assert_equal ::TooManyFieldsAgain.encode(::TooManyFieldsAgain.new(a: 0xFF, b: 456)), data
+
+      exit!
+      #msg = klass::TooManyFieldsAgain.decode(data)
+      #assert_equal 123, msg.a
+      #assert_equal 456, msg.b
+    end
+
     def test_too_many_fields
       unit = parse_string(<<-EOPROTO)
 syntax = "proto3";

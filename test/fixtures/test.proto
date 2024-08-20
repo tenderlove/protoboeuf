@@ -359,3 +359,8 @@ message OneOfEncoder {
 message TooManyFields {
   uint32 a = 32;
 }
+
+message TooManyFieldsAgain {
+  uint32 a = 31;
+  uint32 b = 36;
+}
